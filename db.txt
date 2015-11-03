@@ -1,0 +1,25 @@
+/*分析结果表*/
+drop table if exists rdb_anly_result;
+create table rdb_anly_result(
+	id bigint primary key auto_increment,
+	content text comment '分析的结果',
+	type tinyint comment '类型(代表是哪种分析结果 1-值类型统计, 2-值长度过滤)',
+	task_id varchar(50) comment '任务id',
+	create_time datetime comment '记录生成时间'
+);
+
+/*任务表*/
+drop table if exists rdb_parse_task;
+create table rdb_parse_task(
+	id bigint primary key auto_increment,
+	host varchar(20) comment '要分析的rdb文件所在主机的ip',
+	port varchar(10) comment 'redis的端口号',
+	filter_length int comment '过滤value长度需要的数值',
+	task_id varchar(50) unique comment '分配的任务id',
+	priority int default 0 comment '任务优先级',
+	status tinyint comment '是否成功的拿到了rdb文件并完成了解析 0新任务 1 成功 2 未拿到rdb文件 3未解析成功 4获得redis登陆密码错误 5任务正在执行中',
+	create_time datetime comment '任务创建的时间'
+);
+
+alter table rdb_parse_task add column update_time timestamp after create_time;
+alter table rdb_parse_task add column filter_key varchar(1000) default '' after filter_length
